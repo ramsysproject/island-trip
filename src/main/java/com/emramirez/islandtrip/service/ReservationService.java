@@ -21,10 +21,10 @@ public class ReservationService {
      * @param reservation
      * @return the persisted reservation id
      */
-    public Long reserve(Reservation reservation) {
+    public Reservation reserve(Reservation reservation) {
         validator.validate(reservation);
         Reservation result = repository.save(reservation);
 
-        return result.getId();
+        return result;
     }
 }

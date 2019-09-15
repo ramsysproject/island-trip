@@ -9,8 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.time.LocalDate;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -35,10 +33,10 @@ public class ReservationServiceTest {
         when(repository.save(reservation)).thenReturn(savedReservation);
 
         // act
-        Long reservationId = reservationService.reserve(reservation);
+        Reservation reservationResult = reservationService.reserve(reservation);
 
         // assert
-        assertThat(reservationId, equalTo(RESERVATION_ID));
+        assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
         verify(repository).save(reservation);
         verify(validator).validate(reservation);
     }
