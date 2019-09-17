@@ -31,7 +31,7 @@ public class ReservationControllerTest {
         ResponseEntity result = reservationController.createReservation(reservation);
 
         // assert
-        verify(reservationService).reserve(reservation);
+        verify(reservationService).book(reservation);
         assertThat(result.getStatusCode(), equalTo(HttpStatus.CREATED));
     }
 }

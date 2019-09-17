@@ -20,7 +20,7 @@ public class ReservationController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
-        Reservation result = reservationService.reserve(reservation);
+        Reservation result = reservationService.book(reservation);
         // TODO implement HATEOAS
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }

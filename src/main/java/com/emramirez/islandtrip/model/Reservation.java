@@ -2,20 +2,17 @@ package com.emramirez.islandtrip.model;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
 @Entity
 public class Reservation {
-    @Id
-    private Long id;
 
-    @Column
-    private UUID uuid;
+    @Id
+    @GeneratedValue
+    private UUID id;
 
     @Column
     private LocalDate startingDate;

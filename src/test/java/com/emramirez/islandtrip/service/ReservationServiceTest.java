@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -17,7 +19,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ReservationServiceTest {
 
-    public static final Long RESERVATION_ID = 1L;
+    public static final UUID RESERVATION_ID = UUID.randomUUID();
     @Mock
     ReservationValidator validator;
     @Mock
@@ -33,7 +35,7 @@ public class ReservationServiceTest {
         when(repository.save(reservation)).thenReturn(savedReservation);
 
         // act
-        Reservation reservationResult = reservationService.reserve(reservation);
+        Reservation reservationResult = reservationService.book(reservation);
 
         // assert
         assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));

@@ -21,7 +21,7 @@ public class ReservationService {
      * @param reservation
      * @return the persisted reservation id
      */
-    public Reservation reserve(Reservation reservation) {
+    public Reservation book(Reservation reservation) {
         validator.validate(reservation);
         Reservation result = repository.save(reservation);
 
