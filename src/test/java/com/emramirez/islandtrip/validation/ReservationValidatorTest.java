@@ -6,22 +6,24 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.time.Clock;
 import java.time.LocalDate;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReservationValidatorTest {
 
+    @Mock
+    Clock clock;
+
+    @InjectMocks
     ReservationValidator reservationValidator;
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
-
-    @Before
-    public void setUp() {
-        reservationValidator = new ReservationValidator();
-    }
 
     @Test
     public void validate_nullDatesGiven_exceptionExpected() {
