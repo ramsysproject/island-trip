@@ -1,10 +1,18 @@
 package com.emramirez.islandtrip.service;
 
+import com.emramirez.islandtrip.common.DateUtils;
+import com.emramirez.islandtrip.model.CalendarDate;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.repository.ReservationRepository;
 import com.emramirez.islandtrip.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This class handles business interactions with ${@link Reservation} types.
@@ -23,8 +31,19 @@ public class ReservationService {
      */
     public Reservation book(Reservation reservation) {
         validator.validate(reservation);
-        Reservation result = repository.save(reservation);
+        Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
+        reservation.setCalendarDates(calendarDateSet);
 
-        return result;
+        return repository.save(reservation);
+    }
+
+    private Set<CalendarDate> associateCalendarDates(Reservation reservation) {
+        long bookedDays = DateUtils.getDaysBetween(reservation.getStartingDate(), reservation.getEndingDate());
+        return IntStream.range(0, (int) bookedDays)
+                .mapToObj(value -> {
+                    CalendarDate calendarDate = new CalendarDate();
+                    calendarDate.setCalendarDate(reservation.getStartingDate().plusDays(value));
+                    return calendarDate;
+                }).collect(Collectors.toSet());
     }
 }
