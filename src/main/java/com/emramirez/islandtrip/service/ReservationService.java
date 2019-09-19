@@ -43,7 +43,7 @@ public class ReservationService {
         return IntStream.range(0, (int) bookedDays)
                 .mapToObj(value -> {
                     CalendarDate calendarDate = new CalendarDate();
-                    calendarDate.setCalendarDate(reservation.getStartingDate().plusDays(value));
+                    calendarDate.setDate(reservation.getStartingDate().plusDays(value));
                     calendarDate.setStatus(CalendarDateStatus.BOOKED);
                     return calendarDate;
                 }).collect(Collectors.toSet());

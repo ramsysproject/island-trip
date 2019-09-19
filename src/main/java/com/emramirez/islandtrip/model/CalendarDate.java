@@ -18,7 +18,7 @@ public class CalendarDate {
     private Long id;
 
     @Column(unique = true)
-    private LocalDate calendarDate;
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @JsonIgnore

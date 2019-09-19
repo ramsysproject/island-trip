@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class ReservationController {
 
+    public static final String RANGE_UNAVAILABLE_MESSAGE = "The provided date range is no longer available for booking";
     private final ReservationService reservationService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -27,7 +28,7 @@ public class ReservationController {
             // TODO implement HATEOAS
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (DataIntegrityViolationException ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "The booked date range is no longer available", ex);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, RANGE_UNAVAILABLE_MESSAGE, ex);
         }
     }
 }

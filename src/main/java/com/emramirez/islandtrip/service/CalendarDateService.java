@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,7 +30,7 @@ public class CalendarDateService {
                 .skip(1)
                 .mapToObj(value -> {
                     CalendarDate calendarDate = new CalendarDate();
-                    calendarDate.setCalendarDate(LocalDate.now().plusDays(value));
+                    calendarDate.setDate(LocalDate.now().plusDays(value));
                     return calendarDate;
                 })
                 .filter(calendarDate -> !calendarDateList.contains(calendarDate))
