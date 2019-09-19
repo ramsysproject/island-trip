@@ -24,7 +24,7 @@ public class ReservationValidator implements Validator<Reservation> {
         Objects.requireNonNull(endingDate, "The reservation ending date cannot be null");
 
         if (startingDate.isAfter(endingDate)) {
-            throw new IllegalArgumentException("Starting date cannot be after ending date");
+            throw new IllegalArgumentException("The reservation starting date cannot be after ending date");
         }
 
         if (DateUtils.getDaysBetween(startingDate, endingDate) > 3) {
