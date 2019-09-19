@@ -111,6 +111,20 @@ public class ReservationValidatorTest {
         reservationValidator.validate(reservation);
     }
 
+    @Test
+    public void validate_reservationWithValidRangeGiven_noExceptionExpected() {
+        // arrange
+        LocalDate startingDate = LocalDate.now().plusDays(1);
+        LocalDate endingDate = startingDate.plusDays(3);
+        Reservation reservation = buildReservation(startingDate, endingDate);
+        fixedClock = Clock.fixed(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.of("UTC"));
+        doReturn(fixedClock.instant()).when(clock).instant();
+        doReturn(fixedClock.getZone()).when(clock).getZone();
+
+        // act
+        reservationValidator.validate(reservation);
+    }
+
     private Reservation buildReservation(LocalDate startingDate, LocalDate endingDate) {
         Reservation reservation = new Reservation();
         reservation.setStartingDate(startingDate);
