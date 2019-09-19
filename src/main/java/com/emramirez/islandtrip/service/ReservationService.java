@@ -2,14 +2,14 @@ package com.emramirez.islandtrip.service;
 
 import com.emramirez.islandtrip.common.DateUtils;
 import com.emramirez.islandtrip.model.CalendarDate;
+import com.emramirez.islandtrip.model.CalendarDateStatus;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.repository.ReservationRepository;
 import com.emramirez.islandtrip.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,6 +29,7 @@ public class ReservationService {
      * @param reservation
      * @return the persisted reservation id
      */
+    @Transactional
     public Reservation book(Reservation reservation) {
         validator.validate(reservation);
         Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
@@ -43,6 +44,7 @@ public class ReservationService {
                 .mapToObj(value -> {
                     CalendarDate calendarDate = new CalendarDate();
                     calendarDate.setCalendarDate(reservation.getStartingDate().plusDays(value));
+                    calendarDate.setStatus(CalendarDateStatus.BOOKED);
                     return calendarDate;
                 }).collect(Collectors.toSet());
     }

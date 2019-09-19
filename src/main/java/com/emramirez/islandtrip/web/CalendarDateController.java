@@ -1,7 +1,6 @@
 package com.emramirez.islandtrip.web;
 
 import com.emramirez.islandtrip.model.CalendarDate;
-import com.emramirez.islandtrip.repository.CalendarDateRepository;
 import com.emramirez.islandtrip.service.CalendarDateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -11,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

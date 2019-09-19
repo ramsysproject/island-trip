@@ -17,11 +17,18 @@ public class CalendarDateService {
 
     private final CalendarDateRepository calendarDateRepository;
 
+    /**
+     * Returns the available dates for booking. As a rule, the customers needs to book at least 1 day ahead of arrival.
+     *
+     * @param range how many days ahead the availability is required
+     * @return a list of the available dates
+     */
     public List<CalendarDate> getAvailableCalendarDates(int range) {
         List<CalendarDate> calendarDateList =
                 calendarDateRepository.findByCalendarDateBetween(LocalDate.now(), LocalDate.now().plusDays(range));
 
         List<CalendarDate> freeDates = IntStream.range(0, range)
+                .skip(1)
                 .mapToObj(value -> {
                     CalendarDate calendarDate = new CalendarDate();
                     calendarDate.setCalendarDate(LocalDate.now().plusDays(value));
