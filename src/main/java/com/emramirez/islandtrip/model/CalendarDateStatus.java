@@ -5,5 +5,6 @@ package com.emramirez.islandtrip.model;
  * but in the future we may need to hold extra ones, like not-operational ones.
  */
 public enum CalendarDateStatus {
+    AVAILABLE,
     BOOKED;
 }

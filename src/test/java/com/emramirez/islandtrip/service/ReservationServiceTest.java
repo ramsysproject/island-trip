@@ -23,10 +23,13 @@ import static org.mockito.Mockito.when;
 public class ReservationServiceTest {
 
     public static final UUID RESERVATION_ID = UUID.randomUUID();
+
     @Mock
     ReservationValidator validator;
+
     @Mock
     ReservationRepository repository;
+
     @InjectMocks
     ReservationService reservationService;
 
