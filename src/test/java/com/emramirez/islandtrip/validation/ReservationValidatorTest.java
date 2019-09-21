@@ -1,7 +1,6 @@
 package com.emramirez.islandtrip.validation;
 
 import com.emramirez.islandtrip.model.Reservation;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

@@ -109,6 +109,7 @@
                     <excludes>
                         <exclude>**/configuration/*</exclude>
                         <exclude>**/model/*</exclude>
+                        <exclude>**/Application.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
