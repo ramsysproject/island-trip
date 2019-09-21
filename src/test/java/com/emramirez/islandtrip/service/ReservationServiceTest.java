@@ -2,6 +2,7 @@ package com.emramirez.islandtrip.service;
 
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.repository.ReservationRepository;
+import com.emramirez.islandtrip.utils.TestUtils;
 import com.emramirez.islandtrip.validation.ReservationValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -20,17 +23,20 @@ import static org.mockito.Mockito.when;
 public class ReservationServiceTest {
 
     public static final UUID RESERVATION_ID = UUID.randomUUID();
+
     @Mock
     ReservationValidator validator;
+
     @Mock
     ReservationRepository repository;
+
     @InjectMocks
     ReservationService reservationService;
 
     @Test
     public void reserve_validInputGiven_reservationIdExpected() {
         // arrange
-        Reservation reservation = new Reservation();
+        Reservation reservation = buildReservation();
         Reservation savedReservation = buildResult();
         when(repository.save(reservation)).thenReturn(savedReservation);
 
@@ -43,9 +49,17 @@ public class ReservationServiceTest {
         verify(validator).validate(reservation);
     }
 
+    private Reservation buildReservation() {
+        Reservation reservation = new Reservation();
+        reservation.setStartingDate(LocalDate.now());
+        reservation.setEndingDate(LocalDate.now().plusDays(1));
+        return reservation;
+    }
+
     private Reservation buildResult() {
         Reservation reservation = new Reservation();
         reservation.setId(RESERVATION_ID);
+        reservation.setCalendarDates(Collections.singleton(TestUtils.buildTodayCalendarDate()));
         return reservation;
     }
 }
