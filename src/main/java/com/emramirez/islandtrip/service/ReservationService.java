@@ -1,20 +1,15 @@
 package com.emramirez.islandtrip.service;
 
-import com.emramirez.islandtrip.common.DateUtils;
-import com.emramirez.islandtrip.model.CalendarDate;
-import com.emramirez.islandtrip.model.CalendarDateStatus;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
+import com.emramirez.islandtrip.service.status.ReservationStrategy;
 import com.emramirez.islandtrip.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * This class handles business interactions with ${@link Reservation} types.
@@ -25,6 +20,7 @@ public class ReservationService {
 
     private final Validator<Reservation> validator;
     private final ReservationRepository repository;
+    private final ReservationStrategy reservationStrategy;
 
     /**
      * This method persists a new ${@link Reservation} type.
@@ -34,31 +30,17 @@ public class ReservationService {
     @Transactional
     public Reservation book(Reservation reservation) {
         validator.validate(reservation);
-        Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
-        reservation.setCalendarDates(calendarDateSet);
-        reservation.setStatus(ReservationStatus.ACTIVE);
+        reservationStrategy.getHandler(ReservationStatus.ACTIVE).ifPresent(handler -> handler.accept(reservation));
 
         return repository.save(reservation);
     }
 
     @Transactional
     public Reservation update(Reservation reservation, UUID id) {
-        validator.validate(reservation);
-        Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
-        reservation.setCalendarDates(calendarDateSet);
         reservation.setId(id);
+        validator.validate(reservation);
+        reservationStrategy.getHandler(reservation.getStatus()).ifPresent(handler -> handler.accept(reservation));
 
         return repository.save(reservation);
-    }
-
-    private Set<CalendarDate> associateCalendarDates(Reservation reservation) {
-        long bookedDays = DateUtils.getDaysBetween(reservation.getArrivalDate(), reservation.getDepartureDate());
-        return IntStream.range(0, (int) bookedDays)
-                .mapToObj(value -> {
-                    CalendarDate calendarDate = new CalendarDate();
-                    calendarDate.setDate(reservation.getArrivalDate().plusDays(value));
-                    calendarDate.setStatus(CalendarDateStatus.BOOKED);
-                    return calendarDate;
-                }).collect(Collectors.toSet());
     }
 }
