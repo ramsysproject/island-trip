@@ -20,6 +20,7 @@ public class ReservationController {
 
     public static final String RANGE_UNAVAILABLE_MESSAGE = "The provided date range is no longer available for booking";
     public static final String RESOURCE_STATE_CHANGED = "The resource has been updated or deleted by another transaction";
+
     private final ReservationService reservationService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

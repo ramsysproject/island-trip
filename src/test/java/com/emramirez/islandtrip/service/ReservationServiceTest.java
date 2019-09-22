@@ -34,7 +34,7 @@ public class ReservationServiceTest {
     ReservationService reservationService;
 
     @Test
-    public void reserve_validInputGiven_reservationIdExpected() {
+    public void book_validInputGiven_reservationIdExpected() {
         // arrange
         Reservation reservation = buildReservation();
         Reservation savedReservation = buildResult();
@@ -42,6 +42,22 @@ public class ReservationServiceTest {
 
         // act
         Reservation reservationResult = reservationService.book(reservation);
+
+        // assert
+        assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
+        verify(repository).save(reservation);
+        verify(validator).validate(reservation);
+    }
+
+    @Test
+    public void update_validInputGiven_reservationIdExpected() {
+        // arrange
+        Reservation reservation = buildReservation();
+        Reservation savedReservation = buildResult();
+        when(repository.save(reservation)).thenReturn(savedReservation);
+
+        // act
+        Reservation reservationResult = reservationService.update(reservation, RESERVATION_ID);
 
         // assert
         assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
