@@ -11,6 +11,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -24,7 +25,7 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
+    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
         try {
             Reservation result = reservationService.book(reservation);
             // TODO implement HATEOAS

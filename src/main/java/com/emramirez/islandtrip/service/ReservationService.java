@@ -52,11 +52,11 @@ public class ReservationService {
     }
 
     private Set<CalendarDate> associateCalendarDates(Reservation reservation) {
-        long bookedDays = DateUtils.getDaysBetween(reservation.getStartingDate(), reservation.getEndingDate());
+        long bookedDays = DateUtils.getDaysBetween(reservation.getArrivalDate(), reservation.getDepartureDate());
         return IntStream.range(0, (int) bookedDays)
                 .mapToObj(value -> {
                     CalendarDate calendarDate = new CalendarDate();
-                    calendarDate.setDate(reservation.getStartingDate().plusDays(value));
+                    calendarDate.setDate(reservation.getArrivalDate().plusDays(value));
                     calendarDate.setStatus(CalendarDateStatus.BOOKED);
                     return calendarDate;
                 }).collect(Collectors.toSet());

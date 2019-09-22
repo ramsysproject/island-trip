@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
@@ -12,18 +13,30 @@ import java.util.UUID;
 @Entity
 public class Reservation {
 
-    @Version
-    private Integer version;
-
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column
-    private LocalDate startingDate;
+    @Version
+    private Integer version;
 
     @Column
-    private LocalDate endingDate;
+    @NotNull(message = "Please provide the arrival date")
+    private LocalDate arrivalDate;
+
+    @Column
+    @NotNull(message = "Please provide the departure date")
+    private LocalDate departureDate;
+
+    // TODO check requirements for simplicity
+    @Column
+    @NotNull(message = "Please provide the customer email")
+    private String customerEmail;
+
+    // TODO check requirements for simplicity
+    @Column
+    @NotNull(message = "Please provide the customer name")
+    private String customerName;
 
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;

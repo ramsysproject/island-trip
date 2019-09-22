@@ -67,8 +67,8 @@ public class ReservationServiceTest {
 
     private Reservation buildReservation() {
         Reservation reservation = new Reservation();
-        reservation.setStartingDate(LocalDate.now());
-        reservation.setEndingDate(LocalDate.now().plusDays(1));
+        reservation.setArrivalDate(LocalDate.now());
+        reservation.setDepartureDate(LocalDate.now().plusDays(1));
         return reservation;
     }
 
