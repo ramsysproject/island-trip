@@ -4,6 +4,7 @@ import com.emramirez.islandtrip.common.DateUtils;
 import com.emramirez.islandtrip.model.CalendarDate;
 import com.emramirez.islandtrip.model.CalendarDateStatus;
 import com.emramirez.islandtrip.model.Reservation;
+import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
 import com.emramirez.islandtrip.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -34,6 +36,17 @@ public class ReservationService {
         validator.validate(reservation);
         Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
         reservation.setCalendarDates(calendarDateSet);
+        reservation.setStatus(ReservationStatus.ACTIVE);
+
+        return repository.save(reservation);
+    }
+
+    @Transactional
+    public Reservation update(Reservation reservation, UUID id) {
+        validator.validate(reservation);
+        Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
+        reservation.setCalendarDates(calendarDateSet);
+        reservation.setId(id);
 
         return repository.save(reservation);
     }

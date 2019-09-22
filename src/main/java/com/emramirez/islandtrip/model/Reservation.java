@@ -12,6 +12,9 @@ import java.util.UUID;
 @Entity
 public class Reservation {
 
+    @Version
+    private Integer version;
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -21,6 +24,9 @@ public class Reservation {
 
     @Column
     private LocalDate endingDate;
+
+    @Enumerated(value = EnumType.STRING)
+    private ReservationStatus status;
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
