@@ -22,7 +22,7 @@ public class TestUtils {
         return reservation;
     }
 
-    private static Set<CalendarDate> buildCalendarDatesForRange(int range) {
+    public static Set<CalendarDate> buildCalendarDatesForRange(int range) {
         return IntStream.range(0, range)
                 .mapToObj(value -> {
                     CalendarDate calendarDate = new CalendarDate();
