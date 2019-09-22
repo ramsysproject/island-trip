@@ -1,7 +1,9 @@
 package com.emramirez.islandtrip.service;
 
 import com.emramirez.islandtrip.model.Reservation;
+import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
+import com.emramirez.islandtrip.service.status.ReservationStrategy;
 import com.emramirez.islandtrip.utils.TestUtils;
 import com.emramirez.islandtrip.validation.ReservationValidator;
 import org.junit.Test;
@@ -30,11 +32,14 @@ public class ReservationServiceTest {
     @Mock
     ReservationRepository repository;
 
+    @Mock
+    ReservationStrategy reservationStrategy;
+
     @InjectMocks
     ReservationService reservationService;
 
     @Test
-    public void reserve_validInputGiven_reservationIdExpected() {
+    public void book_validInputGiven_reservationIdExpected() {
         // arrange
         Reservation reservation = buildReservation();
         Reservation savedReservation = buildResult();
@@ -47,12 +52,29 @@ public class ReservationServiceTest {
         assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
         verify(repository).save(reservation);
         verify(validator).validate(reservation);
+        verify(reservationStrategy).getHandler(ReservationStatus.ACTIVE);
+    }
+
+    @Test
+    public void update_validInputGiven_reservationIdExpected() {
+        // arrange
+        Reservation reservation = buildReservation();
+        Reservation savedReservation = buildResult();
+        when(repository.save(reservation)).thenReturn(savedReservation);
+
+        // act
+        Reservation reservationResult = reservationService.update(reservation, RESERVATION_ID);
+
+        // assert
+        assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
+        verify(repository).save(reservation);
+        verify(validator).validate(reservation);
     }
 
     private Reservation buildReservation() {
         Reservation reservation = new Reservation();
-        reservation.setStartingDate(LocalDate.now());
-        reservation.setEndingDate(LocalDate.now().plusDays(1));
+        reservation.setArrivalDate(LocalDate.now());
+        reservation.setDepartureDate(LocalDate.now().plusDays(1));
         return reservation;
     }
 

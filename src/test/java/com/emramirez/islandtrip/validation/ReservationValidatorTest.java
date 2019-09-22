@@ -36,20 +36,20 @@ public class ReservationValidatorTest {
         LocalDate endingDate = null;
         Reservation reservation = buildReservation(startingDate, endingDate);
         expectedEx.expect(NullPointerException.class);
-        expectedEx.expectMessage("The reservation starting date cannot be null");
+        expectedEx.expectMessage("The reservation arrival date cannot be null");
 
         // act
         reservationValidator.validate(reservation);
     }
 
     @Test
-    public void validate_nullStartingDateGiven_exceptionExpected() {
+    public void validate_nullArrivalDateGiven_exceptionExpected() {
         // arrange
         LocalDate startingDate = null;
         LocalDate endingDate = LocalDate.of(2019, 9, 15);
         Reservation reservation = buildReservation(startingDate, endingDate);
         expectedEx.expect(NullPointerException.class);
-        expectedEx.expectMessage("The reservation starting date cannot be null");
+        expectedEx.expectMessage("The reservation arrival date cannot be null");
 
         // act
         reservationValidator.validate(reservation);
@@ -62,20 +62,20 @@ public class ReservationValidatorTest {
         LocalDate endingDate = null;
         Reservation reservation = buildReservation(startingDate, endingDate);
         expectedEx.expect(NullPointerException.class);
-        expectedEx.expectMessage("The reservation ending date cannot be null");
+        expectedEx.expectMessage("The reservation departure date cannot be null");
 
         // act
         reservationValidator.validate(reservation);
     }
 
     @Test
-    public void validate_startAfterEndDateGiven_exceptionExpected() {
+    public void validate_arrivalAfterDepartureDateGiven_exceptionExpected() {
         // arrange
         LocalDate startingDate = LocalDate.of(2019, 9, 15);
         LocalDate endingDate = LocalDate.of(2019, 9, 10);
         Reservation reservation = buildReservation(startingDate, endingDate);
         expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("The reservation starting date cannot be after ending date");
+        expectedEx.expectMessage("The reservation arrival date cannot be after departure date");
 
         // act
         reservationValidator.validate(reservation);
@@ -126,8 +126,8 @@ public class ReservationValidatorTest {
 
     private Reservation buildReservation(LocalDate startingDate, LocalDate endingDate) {
         Reservation reservation = new Reservation();
-        reservation.setStartingDate(startingDate);
-        reservation.setEndingDate(endingDate);
+        reservation.setArrivalDate(startingDate);
+        reservation.setDepartureDate(endingDate);
 
         return reservation;
     }

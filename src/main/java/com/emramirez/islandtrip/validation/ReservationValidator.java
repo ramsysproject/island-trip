@@ -17,22 +17,21 @@ public class ReservationValidator implements Validator<Reservation> {
 
     @Override
     public void validate(Reservation reservation) {
-        LocalDate startingDate = reservation.getStartingDate();
-        LocalDate endingDate = reservation.getEndingDate();
+        LocalDate arrivalDate = reservation.getArrivalDate();
+        LocalDate departureDate = reservation.getDepartureDate();
+        Objects.requireNonNull(arrivalDate, "The reservation arrival date cannot be null");
+        Objects.requireNonNull(departureDate, "The reservation departure date cannot be null");
 
-        Objects.requireNonNull(startingDate, "The reservation starting date cannot be null");
-        Objects.requireNonNull(endingDate, "The reservation ending date cannot be null");
-
-        if (startingDate.isAfter(endingDate)) {
-            throw new IllegalArgumentException("The reservation starting date cannot be after ending date");
+        if (arrivalDate.isAfter(departureDate)) {
+            throw new IllegalArgumentException("The reservation arrival date cannot be after departure date");
         }
 
-        if (DateUtils.getDaysBetween(startingDate, endingDate) > 3) {
+        if (DateUtils.getDaysBetween(arrivalDate, departureDate) > 3) {
             throw new IllegalArgumentException("The maximum reservation period is 3 days");
         }
 
         LocalDate now = LocalDate.now(clock);
-        if (DateUtils.getDaysBetween(now, startingDate) < 1) {
+        if (DateUtils.getDaysBetween(now, arrivalDate) < 1) {
             throw new IllegalArgumentException("The reservation must be at least 1 day ahead");
         }
         // TODO validate reserve is up to 1 month in advance

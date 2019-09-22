@@ -110,6 +110,7 @@
                         <exclude>**/configuration/*</exclude>
                         <exclude>**/model/*</exclude>
                         <exclude>**/Application.*</exclude>
+                        <exclude>**/GlobalErrorHandler.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
