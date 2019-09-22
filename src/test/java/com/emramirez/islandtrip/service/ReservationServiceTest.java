@@ -1,7 +1,9 @@
 package com.emramirez.islandtrip.service;
 
 import com.emramirez.islandtrip.model.Reservation;
+import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
+import com.emramirez.islandtrip.service.status.ReservationStrategy;
 import com.emramirez.islandtrip.utils.TestUtils;
 import com.emramirez.islandtrip.validation.ReservationValidator;
 import org.junit.Test;
@@ -30,6 +32,9 @@ public class ReservationServiceTest {
     @Mock
     ReservationRepository repository;
 
+    @Mock
+    ReservationStrategy reservationStrategy;
+
     @InjectMocks
     ReservationService reservationService;
 
@@ -47,6 +52,7 @@ public class ReservationServiceTest {
         assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
         verify(repository).save(reservation);
         verify(validator).validate(reservation);
+        verify(reservationStrategy).getHandler(ReservationStatus.ACTIVE);
     }
 
     @Test
