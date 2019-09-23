@@ -17,7 +17,12 @@ public class ActiveReservationHandler implements ReservationStatusHandler {
     @Override
     public void accept(Reservation reservation) {
         Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
-        reservation.setCalendarDates(calendarDateSet);
+        if (reservation.getCalendarDates() != null) {
+            reservation.getCalendarDates().addAll(calendarDateSet);
+        } else {
+            reservation.setCalendarDates(calendarDateSet);
+        }
+
         reservation.setStatus(this.supports());
     }
 

@@ -23,7 +23,7 @@ public class TestUtils {
     }
 
     public static Set<CalendarDate> buildCalendarDatesForRange(int range) {
-        return IntStream.range(0, range)
+        return IntStream.range(1, range + 1)
                 .mapToObj(value -> {
                     CalendarDate calendarDate = new CalendarDate();
                     calendarDate.setDate(LocalDate.now().plusDays(value));

@@ -1,5 +1,6 @@
 package com.emramirez.islandtrip.service;
 
+import com.emramirez.islandtrip.dto.UpdateRequestDto;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,17 +60,17 @@ public class ReservationServiceTest {
     @Test
     public void update_validInputGiven_reservationIdExpected() {
         // arrange
-        Reservation reservation = buildReservation();
+        UpdateRequestDto updateRequestDto = buildUpdateRequest();
         Reservation savedReservation = buildResult();
-        when(repository.save(reservation)).thenReturn(savedReservation);
+        when(repository.findById(any(UUID.class))).thenReturn(buildReservation());
+        when(repository.save(any())).thenReturn(savedReservation);
 
         // act
-        Reservation reservationResult = reservationService.update(reservation, RESERVATION_ID);
+        Reservation reservationResult = reservationService.update(updateRequestDto, RESERVATION_ID);
 
         // assert
         assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
-        verify(repository).save(reservation);
-        verify(validator).validate(reservation);
+        verify(repository).save(any());
     }
 
     private Reservation buildReservation() {
@@ -78,9 +80,18 @@ public class ReservationServiceTest {
         return reservation;
     }
 
+    private UpdateRequestDto buildUpdateRequest() {
+        UpdateRequestDto updateRequest = new UpdateRequestDto();
+        updateRequest.setArrivalDate(LocalDate.now());
+        updateRequest.setDepartureDate(LocalDate.now().plusDays(1));
+        return updateRequest;
+    }
+
     private Reservation buildResult() {
         Reservation reservation = new Reservation();
         reservation.setId(RESERVATION_ID);
+        reservation.setArrivalDate(LocalDate.now());
+        reservation.setDepartureDate(LocalDate.now().plusDays(1));
         reservation.setCalendarDates(Collections.singleton(TestUtils.buildTodayCalendarDate()));
         return reservation;
     }

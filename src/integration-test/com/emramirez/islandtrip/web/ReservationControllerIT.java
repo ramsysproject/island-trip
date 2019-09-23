@@ -19,13 +19,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -198,6 +199,41 @@ public class ReservationControllerIT {
         Map map = mapper.readValue(response.getBody(), Map.class);
         assertThat(response.getStatusCode(), equalTo(HttpStatus.CONFLICT));
         assertThat(map.get("message"), equalTo("The provided date range is no longer available for booking"));
+    }
+
+    @Test
+    public void updateReservation_concurrentUpdatesGiven_firstUpdateExecutesAndSecondUpdateFailsWith412Expected() throws IOException {
+        // arrange
+        Reservation reservation = IntegrationTestUtils.buildReservation(
+                LocalDate.now().plusDays(1), LocalDate.now().plusDays(4), CUSTOMER_NAME, CUSTOMER_EMAIL);
+        HttpEntity<Reservation> requestEntity = new HttpEntity<>(reservation, headers);
+        ResponseEntity<String> response = restTemplate
+                .postForEntity(createURLWithPort("/reservations"), requestEntity, String.class);
+        Map postResponse = mapper.readValue(response.getBody(), Map.class);
+        reservation.setId(UUID.fromString(String.valueOf(postResponse.get("id"))));
+        reservation.setVersion(Long.parseLong(String.valueOf(postResponse.get("version"))));
+        reservation.setStatus(ReservationStatus.valueOf(String.valueOf(postResponse.get("status"))));
+
+        // act
+        // execute first update
+        reservation.setCustomerName("Customer1");
+        headers.add("If-Match", reservation.getVersion().toString());
+        HttpEntity<Reservation> firstRequest = new HttpEntity<>(reservation, headers);
+        ResponseEntity<String> firstInvocationResponse = restTemplate
+                .exchange(createURLWithPort(String.format("/reservations/%s", reservation.getId())),
+                        HttpMethod.PUT, firstRequest, String.class);
+
+        // execute second update
+        reservation.setCustomerName("Customer2");
+        headers.add("If-Match", reservation.getVersion().toString());
+        HttpEntity<Reservation> secondRequest = new HttpEntity<>(reservation, headers);
+        ResponseEntity<String> secondInvocationResponse = restTemplate
+                .exchange(createURLWithPort(String.format("/reservations/%s", reservation.getId())),
+                        HttpMethod.PUT, secondRequest, String.class);
+
+        // assert
+        assertThat(firstInvocationResponse.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(secondInvocationResponse.getStatusCode(), equalTo(HttpStatus.PRECONDITION_FAILED));
     }
 
     private String createURLWithPort(String uri) {

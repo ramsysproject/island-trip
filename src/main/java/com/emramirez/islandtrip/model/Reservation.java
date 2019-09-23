@@ -20,7 +20,7 @@ public class Reservation {
     private UUID id;
 
     @Version
-    private Integer version;
+    private Long version;
 
     @Column
     @NotNull(message = "Please provide the arrival date")
@@ -30,12 +30,10 @@ public class Reservation {
     @NotNull(message = "Please provide the departure date")
     private LocalDate departureDate;
 
-    // TODO check requirements for simplicity
     @Column
     @NotNull(message = "Please provide the customer email")
     private String customerEmail;
 
-    // TODO check requirements for simplicity
     @Column
     @NotNull(message = "Please provide the customer name")
     private String customerName;

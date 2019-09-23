@@ -1,11 +1,13 @@
 package com.emramirez.islandtrip.service;
 
+import com.emramirez.islandtrip.dto.UpdateRequestDto;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
 import com.emramirez.islandtrip.service.status.ReservationStrategy;
 import com.emramirez.islandtrip.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationService {
 
     private final Validator<Reservation> validator;
@@ -36,11 +39,35 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation update(Reservation reservation, UUID id) {
-        reservation.setId(id);
-        validator.validate(reservation);
-        reservationStrategy.getHandler(reservation.getStatus()).ifPresent(handler -> handler.accept(reservation));
+    public Reservation update(UpdateRequestDto updateRequestDto, UUID id) {
+        Reservation currentReservation = findById(id);
 
-        return repository.save(reservation);
+        if (( !updateRequestDto.getArrivalDate().equals(currentReservation.getArrivalDate())
+                || !updateRequestDto.getDepartureDate().equals(currentReservation.getDepartureDate()) ) &&
+                updateRequestDto.getStatus() == ReservationStatus.ACTIVE) {
+
+            log.info("Request to modify reservation dates received");
+            updateFields(currentReservation, updateRequestDto);
+            reservationStrategy.getHandler(updateRequestDto.getStatus()).ifPresent(it -> it.accept(currentReservation));
+        } else {
+            updateFields(currentReservation, updateRequestDto);
+        }
+
+        return repository.save(currentReservation);
+    }
+
+    public Reservation findById(UUID uuid) {
+        return  repository.findById(uuid);
+    }
+
+    private Reservation updateFields(Reservation reservation, UpdateRequestDto updateRequestDto) {
+        reservation.setStatus(updateRequestDto.getStatus());
+        reservation.setVersion(updateRequestDto.getVersion());
+        reservation.setCustomerName(updateRequestDto.getCustomerName());
+        reservation.setCustomerEmail(updateRequestDto.getCustomerEmail());
+        reservation.setArrivalDate(updateRequestDto.getArrivalDate());
+        reservation.setDepartureDate(updateRequestDto.getDepartureDate());
+
+        return reservation;
     }
 }

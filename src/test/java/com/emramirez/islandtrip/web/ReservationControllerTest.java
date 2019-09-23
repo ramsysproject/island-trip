@@ -1,5 +1,6 @@
 package com.emramirez.islandtrip.web;
 
+import com.emramirez.islandtrip.dto.UpdateRequestDto;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.service.ReservationService;
 import org.junit.Rule;
@@ -67,29 +68,29 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void updateReservation_reservationGiven_reserveServiceInvocationAnd200ResultExpected() {
+    public void updateReservation_updateRequestGiven_reserveServiceInvocationAnd200ResultExpected() {
         // arrange
-        Reservation reservation = new Reservation();
+        UpdateRequestDto updateRequest = new UpdateRequestDto();
         UUID uuid = UUID.randomUUID();
 
         // act
-        ResponseEntity result = reservationController.updateReservation(uuid, reservation);
+        ResponseEntity result = reservationController.updateReservation(null, uuid, updateRequest);
 
         // assert
-        verify(reservationService).update(reservation, uuid);
+        verify(reservationService).update(updateRequest, uuid);
         assertThat(result.getStatusCode(), equalTo(HttpStatus.OK));
     }
 
     @Test
     public void updateReservation_dataIntegrityExceptionThrown_409ResponseExpected() {
         // arrange
-        Reservation reservation = new Reservation();
+        UpdateRequestDto updateRequest = new UpdateRequestDto();
         UUID uuid = UUID.randomUUID();
-        when(reservationService.update(reservation, uuid)).thenThrow(DataIntegrityViolationException.class);
+        when(reservationService.update(updateRequest, uuid)).thenThrow(DataIntegrityViolationException.class);
 
         // act
         try {
-            reservationController.updateReservation(uuid, reservation);
+            reservationController.updateReservation(null, uuid, updateRequest);
         } catch (ResponseStatusException ex) {
             // assert
             assertThat(ex.getStatus(), equalTo(HttpStatus.CONFLICT));
@@ -102,13 +103,13 @@ public class ReservationControllerTest {
     @Test
     public void updateReservation_optimisticLockingExceptionThrown_409ResponseExpected() {
         // arrange
-        Reservation reservation = new Reservation();
+        UpdateRequestDto updateRequest = new UpdateRequestDto();
         UUID uuid = UUID.randomUUID();
-        when(reservationService.update(reservation, uuid)).thenThrow(ObjectOptimisticLockingFailureException.class);
+        when(reservationService.update(updateRequest, uuid)).thenThrow(ObjectOptimisticLockingFailureException.class);
 
         // act
         try {
-            reservationController.updateReservation(uuid, reservation);
+            reservationController.updateReservation(null, uuid, updateRequest);
         } catch (ResponseStatusException ex) {
             // assert
             assertThat(ex.getStatus(), equalTo(HttpStatus.CONFLICT));
