@@ -62,7 +62,6 @@ public class ReservationService {
 
     private Reservation updateFields(Reservation reservation, UpdateRequestDto updateRequestDto) {
         reservation.setStatus(updateRequestDto.getStatus());
-        reservation.setVersion(updateRequestDto.getVersion());
         reservation.setCustomerName(updateRequestDto.getCustomerName());
         reservation.setCustomerEmail(updateRequestDto.getCustomerEmail());
         reservation.setArrivalDate(updateRequestDto.getArrivalDate());

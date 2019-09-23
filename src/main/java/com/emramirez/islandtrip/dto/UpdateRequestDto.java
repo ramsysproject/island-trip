@@ -7,7 +7,6 @@ import java.time.LocalDate;
 
 @Data
 public class UpdateRequestDto {
-    private Long version;
     private LocalDate arrivalDate;
     private LocalDate departureDate;
     private String customerEmail;

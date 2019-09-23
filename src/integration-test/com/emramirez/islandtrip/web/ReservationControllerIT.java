@@ -60,23 +60,23 @@ public class ReservationControllerIT {
     public void setUp() {
         reservationRepository.deleteAll();
         calendarDateRepository.deleteAll();
+        mapper.findAndRegisterModules();
     }
 
     @Test
-    public void createReservation_validReservationGiven_status201Expected() {
+    public void createReservation_validReservationGiven_status201Expected() throws IOException {
         // arrange
         Reservation reservation = IntegrationTestUtils.buildReservation(
                 LocalDate.now().plusDays(1), LocalDate.now().plusDays(4), CUSTOMER_NAME, CUSTOMER_EMAIL);
         HttpEntity<Reservation> requestEntity = new HttpEntity<>(reservation, headers);
 
         // act
-        ResponseEntity<Reservation> response = restTemplate
-                .postForEntity(createURLWithPort("/reservations"), requestEntity, Reservation.class);
+        ResponseEntity<String> response = restTemplate
+                .postForEntity(createURLWithPort("/reservations"), requestEntity, String.class);
 
         // assert
-        Reservation result = response.getBody();
+        Reservation result = mapper.readValue(response.getBody(), Reservation.class);
         assertThat(response.getStatusCode(), equalTo(HttpStatus.CREATED));
-        assertThat(result.getId(), notNullValue());
         assertThat(result.getStatus(), equalTo(ReservationStatus.ACTIVE));
         assertThat(result.getArrivalDate(), equalTo(reservation.getArrivalDate()));
         assertThat(result.getDepartureDate(), equalTo(reservation.getDepartureDate()));

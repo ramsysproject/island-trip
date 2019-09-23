@@ -154,6 +154,7 @@
                     <excludes>
                         <exclude>**/configuration/*</exclude>
                         <exclude>**/model/*</exclude>
+                        <exclude>**/dto/*</exclude>
                         <exclude>**/Application.*</exclude>
                         <exclude>**/GlobalErrorHandler.*</exclude>
                     </excludes>
