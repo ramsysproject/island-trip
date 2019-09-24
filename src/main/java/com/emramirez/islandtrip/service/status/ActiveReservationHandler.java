@@ -16,25 +16,36 @@ public class ActiveReservationHandler implements ReservationStatusHandler {
 
     @Override
     public void accept(Reservation reservation) {
-        Set<CalendarDate> calendarDateSet = associateCalendarDates(reservation);
+        Set<CalendarDate> calendarDatesRange = getCalendarDatesRange(reservation);
         if (reservation.getCalendarDates() != null) {
-            reservation.getCalendarDates().addAll(calendarDateSet);
+            reservation.getCalendarDates().addAll(calendarDatesRange);
+            reservation.getCalendarDates().removeAll(getOrphans(reservation, calendarDatesRange));
         } else {
-            reservation.setCalendarDates(calendarDateSet);
+            reservation.setCalendarDates(calendarDatesRange);
         }
 
         reservation.setStatus(this.supports());
     }
 
-    private Set<CalendarDate> associateCalendarDates(Reservation reservation) {
+    private Set<CalendarDate> getOrphans(Reservation reservation, Set<CalendarDate> calendarDatesRange) {
+        return reservation.getCalendarDates()
+                .stream()
+                .filter(it -> !calendarDatesRange.contains(it))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<CalendarDate> getCalendarDatesRange(Reservation reservation) {
         long bookedDays = DateUtils.getDaysBetween(reservation.getArrivalDate(), reservation.getDepartureDate());
         return IntStream.range(0, (int) bookedDays)
-                .mapToObj(value -> {
-                    CalendarDate calendarDate = new CalendarDate();
-                    calendarDate.setDate(reservation.getArrivalDate().plusDays(value));
-                    calendarDate.setStatus(CalendarDateStatus.BOOKED);
-                    return calendarDate;
-                }).collect(Collectors.toSet());
+                .mapToObj(value -> buildCalendarDate(reservation, value))
+                .collect(Collectors.toSet());
+    }
+
+    private CalendarDate buildCalendarDate(Reservation reservation, int value) {
+        CalendarDate calendarDate = new CalendarDate();
+        calendarDate.setDate(reservation.getArrivalDate().plusDays(value));
+        calendarDate.setStatus(CalendarDateStatus.BOOKED);
+        return calendarDate;
     }
 
     @Override
