@@ -47,7 +47,7 @@ public class ReservationService {
      * @return the updated reservation
      */
     @Transactional
-    public Reservation update(UpdateRequestDto updateRequestDto, UUID id) {
+    public Reservation update(UpdateRequestDto updateRequestDto, UUID id) throws ValidationException {
         Reservation currentReservation = findById(id);
         ReservationStatus updatedStatus = updateRequestDto.getStatus();
 
@@ -61,6 +61,7 @@ public class ReservationService {
             applyStrategy(currentReservation, updatedStatus);
         }
         updateFields(currentReservation, updateRequestDto);
+        validator.validate(currentReservation);
 
         return repository.save(currentReservation);
     }

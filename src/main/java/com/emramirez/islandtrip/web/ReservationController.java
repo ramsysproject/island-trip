@@ -62,7 +62,7 @@ public class ReservationController {
      */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Reservation> updateReservation(WebRequest request, @PathVariable UUID id,
-                                                         @RequestBody UpdateRequestDto updateRequestDto) {
+                                                         @Valid @RequestBody UpdateRequestDto updateRequestDto) {
         Reservation currentReservation = reservationService.findById(id);
         if (currentReservation == null) {
             return ResponseEntity.notFound().build();
@@ -84,6 +84,8 @@ public class ReservationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RANGE_UNAVAILABLE_MESSAGE, ex);
         } catch (ObjectOptimisticLockingFailureException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RESOURCE_STATE_CHANGED, ex);
+        } catch (ValidationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
     }
 }

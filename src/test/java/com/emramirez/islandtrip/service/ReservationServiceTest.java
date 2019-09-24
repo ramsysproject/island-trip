@@ -65,7 +65,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_unmodifiedReservationDatesGiven_saveAndNoStrategyInvokedExpected() {
+    public void update_unmodifiedReservationDatesGiven_saveAndNoStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         Reservation savedReservation = buildResult();
@@ -81,7 +81,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_modifiedArrivalAndDepartureDateGiven_saveAndStrategyInvokedExpected() {
+    public void update_modifiedArrivalAndDepartureDateGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         updateRequestDto.setArrivalDate(LocalDate.now().plusDays(2));
@@ -99,7 +99,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_modifiedArrivalDateGiven_saveAndStrategyInvokedExpected() {
+    public void update_modifiedArrivalDateGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         updateRequestDto.setArrivalDate(LocalDate.now().plusDays(2));
@@ -116,7 +116,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_modifiedDepartureDateGiven_saveAndStrategyInvokedExpected() {
+    public void update_modifiedDepartureDateGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         updateRequestDto.setDepartureDate(LocalDate.now().plusDays(2));
@@ -133,7 +133,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_cancelledStatusGiven_saveAndStrategyInvokedExpected() {
+    public void update_cancelledStatusGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.CANCELLED);
         Reservation savedReservation = buildResult();
@@ -149,7 +149,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_validStatusGiven_strategyFoundAndInvokedExpected() {
+    public void update_validStatusGiven_strategyFoundAndInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.CANCELLED);
         Reservation savedReservation = buildResult();
