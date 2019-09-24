@@ -1,5 +1,6 @@
 package com.emramirez.islandtrip.web;
 
+import com.emramirez.islandtrip.dto.UpdateRequestDto;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.UUID;
+
+import static org.springframework.util.StringUtils.isEmpty;
 
 @RestController
 @RequestMapping("/reservations")
@@ -21,6 +25,8 @@ public class ReservationController {
 
     public static final String RANGE_UNAVAILABLE_MESSAGE = "The provided date range is no longer available for booking";
     public static final String RESOURCE_STATE_CHANGED = "The resource has been updated or deleted by another transaction";
+    public static final String INVALID_ETAG_MESSAGE = "The provided entity tag is not longer valid";
+    public static final String MISSING_ETAG_MESSAGE = "The If-Match request header must contain an eTag value";
 
     private final ReservationService reservationService;
 
@@ -28,19 +34,35 @@ public class ReservationController {
     public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
         try {
             Reservation result = reservationService.book(reservation);
-            // TODO implement HATEOAS
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .eTag(String.valueOf(result.getVersion()))
+                    .body(result);
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RANGE_UNAVAILABLE_MESSAGE, ex);
         }
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Reservation> updateReservation(@PathVariable UUID id, @RequestBody Reservation reservation) {
-        try {
-            Reservation result = reservationService.update(reservation, id);
+    public ResponseEntity<Reservation> updateReservation(WebRequest request, @PathVariable UUID id,
+                                                         @RequestBody UpdateRequestDto updateRequestDto) {
+        Reservation currentReservation = reservationService.findById(id);
+        if (currentReservation == null) {
+            return ResponseEntity.notFound().build();
+        }
+        String ifMatchValue = request.getHeader("If-Match");
+        if (isEmpty(ifMatchValue)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MISSING_ETAG_MESSAGE);
+        }
+        if (!ifMatchValue.equals(currentReservation.getVersion().toString())) {
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, INVALID_ETAG_MESSAGE);
+        }
 
-            return ResponseEntity.ok(result);
+        try {
+            Reservation result = reservationService.update(updateRequestDto, id);
+            return ResponseEntity.ok()
+                    .eTag(String.valueOf(result.getVersion()))
+                    .body(result);
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RANGE_UNAVAILABLE_MESSAGE, ex);
         } catch (ObjectOptimisticLockingFailureException ex) {

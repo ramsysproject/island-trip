@@ -27,4 +27,18 @@ public class ActiveReservationHandlerTest {
         assertThat(reservation.getCalendarDates().size(), equalTo(5));
         assertThat(reservation.getStatus(), equalTo(ReservationStatus.ACTIVE));
     }
+
+    @Test
+    public void accept_reservationWithoutCalendarDatesGiven_reservationWithCalendarDatesExpected() {
+        // arrange
+        Reservation reservation = TestUtils.buildReservationWithCalendarDates(5, ReservationStatus.ACTIVE);
+        reservation.setCalendarDates(null);
+
+        // act
+        handler.accept(reservation);
+
+        // assert
+        assertThat(reservation.getCalendarDates().size(), equalTo(5));
+        assertThat(reservation.getStatus(), equalTo(ReservationStatus.ACTIVE));
+    }
 }

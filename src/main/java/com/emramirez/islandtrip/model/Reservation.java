@@ -1,6 +1,7 @@
 package com.emramirez.islandtrip.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -15,10 +16,11 @@ public class Reservation {
 
     @Id
     @GeneratedValue
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
     @Version
-    private Integer version;
+    private Long version;
 
     @Column
     @NotNull(message = "Please provide the arrival date")
@@ -28,12 +30,10 @@ public class Reservation {
     @NotNull(message = "Please provide the departure date")
     private LocalDate departureDate;
 
-    // TODO check requirements for simplicity
     @Column
     @NotNull(message = "Please provide the customer email")
     private String customerEmail;
 
-    // TODO check requirements for simplicity
     @Column
     @NotNull(message = "Please provide the customer name")
     private String customerName;
