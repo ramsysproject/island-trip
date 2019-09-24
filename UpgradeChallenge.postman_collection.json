@@ -1,0 +1,96 @@
+{
+	"variables": [],
+	"info": {
+		"name": "UpgradeChallenge",
+		"_postman_id": "72023c2c-4b9d-ec87-fb8a-b757d2921939",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/reservations",
+			"request": {
+				"url": "http://localhost:9000/reservations",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"arrivalDate\": \"2019-09-27\",\n\t\"departureDate\": \"2019-09-28\",\n\t\"customerName\": \"Emanuel Rama\",\n\t\"customerEmail\": \"test@test.com\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "/reservations/{id}",
+			"request": {
+				"url": "http://localhost:9000/reservations/35675c2d-1109-4523-bd6e-9429125d3949",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "If-Match",
+						"value": "0",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"35675c2d-1109-4523-bd6e-9429125d3949\",\n    \"arrivalDate\": \"2019-09-27\",\n    \"departureDate\": \"2019-09-25\",\n    \"customerEmail\": \"test@test.com\",\n    \"customerName\": \"Emanuel Rama\",\n    \"status\": \"ACTIVE\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "/calendar-dates/available?range={}",
+			"request": {
+				"url": {
+					"raw": "http://localhost:9000/calendar-dates/availability?range=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9000",
+					"path": [
+						"calendar-dates",
+						"availability"
+					],
+					"query": [
+						{
+							"key": "range",
+							"value": "10",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"startingDate\": \"2019-09-18\",\n\t\"endingDate\": \"2019-09-21\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
