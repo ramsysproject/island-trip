@@ -24,7 +24,7 @@ public class CalendarDateController {
      *
      * @return a list of available ${@link CalendarDate}
      */
-    @GetMapping(value = "/available", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/availability", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CalendarDate>> getAvailableDates(@RequestParam(defaultValue = "30") int range){
         List<CalendarDate> calendarDateList = calendarDateService.getAvailableCalendarDates(range);
 

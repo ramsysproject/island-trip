@@ -1,6 +1,7 @@
 package com.emramirez.islandtrip.web;
 
 import com.emramirez.islandtrip.dto.UpdateRequestDto;
+import com.emramirez.islandtrip.exception.ValidationException;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,12 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
+    /**
+     * Creates a new entity of type ${@link Reservation}.
+     *
+     * @param reservation
+     * @return the new reservation, or an error code
+     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
         try {
@@ -40,12 +47,22 @@ public class ReservationController {
                     .body(result);
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RANGE_UNAVAILABLE_MESSAGE, ex);
+        } catch (ValidationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
     }
 
+    /**
+     * Attemps to modify a given ${@link Reservation} entity.
+     *
+     * @param request holds the eTag
+     * @param id the resource id
+     * @param updateRequestDto the dto which holds the fields to modify
+     * @return the updated reservation, or an error code
+     */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Reservation> updateReservation(WebRequest request, @PathVariable UUID id,
-                                                         @RequestBody UpdateRequestDto updateRequestDto) {
+                                                         @Valid @RequestBody UpdateRequestDto updateRequestDto) {
         Reservation currentReservation = reservationService.findById(id);
         if (currentReservation == null) {
             return ResponseEntity.notFound().build();
@@ -67,6 +84,8 @@ public class ReservationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RANGE_UNAVAILABLE_MESSAGE, ex);
         } catch (ObjectOptimisticLockingFailureException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RESOURCE_STATE_CHANGED, ex);
+        } catch (ValidationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
     }
 }

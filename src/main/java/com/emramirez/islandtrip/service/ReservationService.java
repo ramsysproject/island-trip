@@ -1,6 +1,7 @@
 package com.emramirez.islandtrip.service;
 
 import com.emramirez.islandtrip.dto.UpdateRequestDto;
+import com.emramirez.islandtrip.exception.ValidationException;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
@@ -31,15 +32,22 @@ public class ReservationService {
      * @return the persisted reservation id
      */
     @Transactional
-    public Reservation book(Reservation reservation) {
+    public Reservation book(Reservation reservation) throws ValidationException {
         validator.validate(reservation);
         applyStrategy(reservation, ReservationStatus.ACTIVE);
 
         return repository.save(reservation);
     }
 
+    /**
+     * This methods updates a ${@link Reservation} entity. It applies a strategy based on the reservation status.
+     *
+     * @param updateRequestDto the dto which holds modified data
+     * @param id the entity id
+     * @return the updated reservation
+     */
     @Transactional
-    public Reservation update(UpdateRequestDto updateRequestDto, UUID id) {
+    public Reservation update(UpdateRequestDto updateRequestDto, UUID id) throws ValidationException {
         Reservation currentReservation = findById(id);
         ReservationStatus updatedStatus = updateRequestDto.getStatus();
 
@@ -53,6 +61,7 @@ public class ReservationService {
             applyStrategy(currentReservation, updatedStatus);
         }
         updateFields(currentReservation, updateRequestDto);
+        validator.validate(currentReservation);
 
         return repository.save(currentReservation);
     }
@@ -61,6 +70,12 @@ public class ReservationService {
         reservationStrategy.getHandler(status).ifPresent(it -> it.accept(currentReservation));
     }
 
+    /**
+     * Finds a ${@link Reservation} based on a given id.
+     *
+     * @param uuid the given id
+     * @return the reservation or null otherwise
+     */
     public Reservation findById(UUID uuid) {
         return  repository.findById(uuid);
     }

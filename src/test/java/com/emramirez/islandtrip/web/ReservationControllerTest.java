@@ -1,6 +1,7 @@
 package com.emramirez.islandtrip.web;
 
 import com.emramirez.islandtrip.dto.UpdateRequestDto;
+import com.emramirez.islandtrip.exception.ValidationException;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.service.ReservationService;
 import org.junit.Rule;
@@ -40,7 +41,7 @@ public class ReservationControllerTest {
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
-    public void createReservation_reservationGiven_reserveServiceInvocationAnd201ResultExpected() {
+    public void createReservation_reservationGiven_reserveServiceInvocationAnd201ResultExpected() throws ValidationException {
         // arrange
         Reservation reservation = new Reservation();
         reservation.setVersion(0L);
@@ -55,7 +56,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void createReservation_dataIntegrityExceptionThrown_409ResponseExpected() {
+    public void createReservation_dataIntegrityExceptionThrown_409ResponseExpected() throws ValidationException {
         // arrange
         Reservation reservation = new Reservation();
         when(reservationService.book(reservation)).thenThrow(DataIntegrityViolationException.class);
@@ -73,7 +74,24 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void updateReservation_updateRequestGiven_reserveServiceInvocationAnd200ResultExpected() {
+    public void createReservation_validationExceptionThrown_400ResponseExpected() throws ValidationException {
+        // arrange
+        Reservation reservation = new Reservation();
+        when(reservationService.book(reservation)).thenThrow(ValidationException.class);
+
+        // act
+        try {
+            reservationController.createReservation(reservation);
+        } catch (ResponseStatusException ex) {
+            // assert
+            assertThat(ex.getStatus(), equalTo(HttpStatus.BAD_REQUEST));
+        } catch (Exception ex) {
+            fail(EXPECTING_A_RESPONSE_STATUS_EXCEPTION_BUT_NONE_WAS_THROWN);
+        }
+    }
+
+    @Test
+    public void updateReservation_updateRequestGiven_reserveServiceInvocationAnd200ResultExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequest = new UpdateRequestDto();
         Reservation reservation = new Reservation();
@@ -93,7 +111,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void updateReservation_dataIntegrityExceptionThrown_409ResponseExpected() {
+    public void updateReservation_dataIntegrityExceptionThrown_409ResponseExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequest = new UpdateRequestDto();
         Reservation reservation = new Reservation();
@@ -117,7 +135,7 @@ public class ReservationControllerTest {
     }
 
     @Test
-    public void updateReservation_optimisticLockingExceptionThrown_409ResponseExpected() {
+    public void updateReservation_optimisticLockingExceptionThrown_409ResponseExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequest = new UpdateRequestDto();
         Reservation reservation = new Reservation();
@@ -181,6 +199,29 @@ public class ReservationControllerTest {
             // assert
             assertThat(ex.getStatus(), equalTo(HttpStatus.PRECONDITION_FAILED));
             assertThat(ex.getReason(), equalTo("The provided entity tag is not longer valid"));
+        } catch (Exception ex) {
+            fail(EXPECTING_A_RESPONSE_STATUS_EXCEPTION_BUT_NONE_WAS_THROWN);
+        }
+    }
+
+    @Test
+    public void updateReservation_validationExceptionThrown_400ResponseExpected() throws ValidationException {
+        // arrange
+        UpdateRequestDto updateRequest = new UpdateRequestDto();
+        Reservation reservation = new Reservation();
+        reservation.setVersion(0L);
+        UUID uuid = UUID.randomUUID();
+        WebRequest webRequest = mock(WebRequest.class);
+        when(webRequest.getHeader("If-Match")).thenReturn("0");
+        when(reservationService.findById(uuid)).thenReturn(reservation);
+        when(reservationService.update(updateRequest, uuid)).thenThrow(ValidationException.class);
+
+        // act
+        try {
+            reservationController.updateReservation(webRequest, uuid, updateRequest);
+        } catch (ResponseStatusException ex) {
+            // assert
+            assertThat(ex.getStatus(), equalTo(HttpStatus.BAD_REQUEST));
         } catch (Exception ex) {
             fail(EXPECTING_A_RESPONSE_STATUS_EXCEPTION_BUT_NONE_WAS_THROWN);
         }

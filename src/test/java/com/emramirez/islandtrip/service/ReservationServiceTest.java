@@ -1,6 +1,7 @@
 package com.emramirez.islandtrip.service;
 
 import com.emramirez.islandtrip.dto.UpdateRequestDto;
+import com.emramirez.islandtrip.exception.ValidationException;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
@@ -47,7 +48,7 @@ public class ReservationServiceTest {
     ReservationService reservationService;
 
     @Test
-    public void book_validInputGiven_reservationIdExpected() {
+    public void book_validInputGiven_reservationIdExpected() throws ValidationException {
         // arrange
         Reservation reservation = buildReservation();
         Reservation savedReservation = buildResult();
@@ -64,7 +65,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_unmodifiedReservationDatesGiven_saveAndNoStrategyInvokedExpected() {
+    public void update_unmodifiedReservationDatesGiven_saveAndNoStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         Reservation savedReservation = buildResult();
@@ -80,7 +81,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_modifiedArrivalAndDepartureDateGiven_saveAndStrategyInvokedExpected() {
+    public void update_modifiedArrivalAndDepartureDateGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         updateRequestDto.setArrivalDate(LocalDate.now().plusDays(2));
@@ -98,7 +99,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_modifiedArrivalDateGiven_saveAndStrategyInvokedExpected() {
+    public void update_modifiedArrivalDateGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         updateRequestDto.setArrivalDate(LocalDate.now().plusDays(2));
@@ -115,7 +116,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_modifiedDepartureDateGiven_saveAndStrategyInvokedExpected() {
+    public void update_modifiedDepartureDateGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         updateRequestDto.setDepartureDate(LocalDate.now().plusDays(2));
@@ -132,7 +133,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_cancelledStatusGiven_saveAndStrategyInvokedExpected() {
+    public void update_cancelledStatusGiven_saveAndStrategyInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.CANCELLED);
         Reservation savedReservation = buildResult();
@@ -148,7 +149,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_validStatusGiven_strategyFoundAndInvokedExpected() {
+    public void update_validStatusGiven_strategyFoundAndInvokedExpected() throws ValidationException {
         // arrange
         UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.CANCELLED);
         Reservation savedReservation = buildResult();

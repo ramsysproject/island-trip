@@ -1,5 +1,6 @@
 package com.emramirez.islandtrip.validation;
 
+import com.emramirez.islandtrip.exception.ValidationException;
 import com.emramirez.islandtrip.model.Reservation;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class ReservationValidatorTest {
     private Clock fixedClock;
 
     @Test
-    public void validate_nullDatesGiven_exceptionExpected() {
+    public void validate_nullDatesGiven_exceptionExpected() throws ValidationException {
         // arrange
         LocalDate startingDate = null;
         LocalDate endingDate = null;
@@ -43,7 +44,7 @@ public class ReservationValidatorTest {
     }
 
     @Test
-    public void validate_nullArrivalDateGiven_exceptionExpected() {
+    public void validate_nullArrivalDateGiven_exceptionExpected() throws ValidationException {
         // arrange
         LocalDate startingDate = null;
         LocalDate endingDate = LocalDate.of(2019, 9, 15);
@@ -56,7 +57,7 @@ public class ReservationValidatorTest {
     }
 
     @Test
-    public void validate_nullEndingDateGiven_exceptionExpected() {
+    public void validate_nullEndingDateGiven_exceptionExpected() throws ValidationException {
         // arrange
         LocalDate startingDate = LocalDate.of(2019, 9, 15);
         LocalDate endingDate = null;
@@ -69,12 +70,12 @@ public class ReservationValidatorTest {
     }
 
     @Test
-    public void validate_arrivalAfterDepartureDateGiven_exceptionExpected() {
+    public void validate_arrivalAfterDepartureDateGiven_exceptionExpected() throws ValidationException {
         // arrange
         LocalDate startingDate = LocalDate.of(2019, 9, 15);
         LocalDate endingDate = LocalDate.of(2019, 9, 10);
         Reservation reservation = buildReservation(startingDate, endingDate);
-        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expect(ValidationException.class);
         expectedEx.expectMessage("The reservation arrival date cannot be after departure date");
 
         // act
@@ -82,12 +83,12 @@ public class ReservationValidatorTest {
     }
 
     @Test
-    public void validate_reservationRangeGreaterThanThreeDaysGiven_exceptionExpected() {
+    public void validate_reservationRangeGreaterThanThreeDaysGiven_exceptionExpected() throws ValidationException {
         // arrange
         LocalDate startingDate = LocalDate.of(2019, 9, 15);
         LocalDate endingDate = LocalDate.of(2019, 9, 19);
         Reservation reservation = buildReservation(startingDate, endingDate);
-        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expect(ValidationException.class);
         expectedEx.expectMessage("The maximum reservation period is 3 days");
 
         // act
@@ -95,12 +96,12 @@ public class ReservationValidatorTest {
     }
 
     @Test
-    public void validate_reservationForCurrentDayGiven_exceptionExpected() {
+    public void validate_reservationForCurrentDayGiven_exceptionExpected() throws ValidationException {
         // arrange
         LocalDate startingDate = LocalDate.now();
         LocalDate endingDate = startingDate.plusDays(1);
         Reservation reservation = buildReservation(startingDate, endingDate);
-        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expect(ValidationException.class);
         expectedEx.expectMessage("The reservation must be at least 1 day ahead");
         fixedClock = Clock.fixed(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.of("UTC"));
         doReturn(fixedClock.instant()).when(clock).instant();
@@ -111,7 +112,23 @@ public class ReservationValidatorTest {
     }
 
     @Test
-    public void validate_reservationWithValidRangeGiven_noExceptionExpected() {
+    public void validate_reservationMoreThan30DaysAheadGiven_exceptionExpected() throws ValidationException {
+        // arrange
+        LocalDate startingDate = LocalDate.now().plusDays(31);
+        LocalDate endingDate = startingDate.plusDays(3);
+        Reservation reservation = buildReservation(startingDate, endingDate);
+        expectedEx.expect(ValidationException.class);
+        expectedEx.expectMessage("The reservation can be placed up to 30 days in advance");
+        fixedClock = Clock.fixed(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.of("UTC"));
+        doReturn(fixedClock.instant()).when(clock).instant();
+        doReturn(fixedClock.getZone()).when(clock).getZone();
+
+        // act
+        reservationValidator.validate(reservation);
+    }
+
+    @Test
+    public void validate_reservationWithValidRangeGiven_noExceptionExpected() throws ValidationException {
         // arrange
         LocalDate startingDate = LocalDate.now().plusDays(1);
         LocalDate endingDate = startingDate.plusDays(3);

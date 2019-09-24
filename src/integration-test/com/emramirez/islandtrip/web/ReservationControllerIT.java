@@ -211,13 +211,12 @@ public class ReservationControllerIT {
                 .postForEntity(createURLWithPort("/reservations"), requestEntity, String.class);
         Map postResponse = mapper.readValue(response.getBody(), Map.class);
         reservation.setId(UUID.fromString(String.valueOf(postResponse.get("id"))));
-        reservation.setVersion(Long.parseLong(String.valueOf(postResponse.get("version"))));
         reservation.setStatus(ReservationStatus.valueOf(String.valueOf(postResponse.get("status"))));
 
         // act
         // execute first update
         reservation.setCustomerName("Customer1");
-        headers.add("If-Match", reservation.getVersion().toString());
+        headers.add("If-Match", response.getHeaders().get("Etag").get(0).replaceAll("\"", ""));
         HttpEntity<Reservation> firstRequest = new HttpEntity<>(reservation, headers);
         ResponseEntity<String> firstInvocationResponse = restTemplate
                 .exchange(createURLWithPort(String.format("/reservations/%s", reservation.getId())),
@@ -225,7 +224,7 @@ public class ReservationControllerIT {
 
         // execute second update
         reservation.setCustomerName("Customer2");
-        headers.add("If-Match", reservation.getVersion().toString());
+        headers.add("If-Match", response.getHeaders().get("Etag").get(0));
         HttpEntity<Reservation> secondRequest = new HttpEntity<>(reservation, headers);
         ResponseEntity<String> secondInvocationResponse = restTemplate
                 .exchange(createURLWithPort(String.format("/reservations/%s", reservation.getId())),
