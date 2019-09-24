@@ -1,6 +1,7 @@
 package com.emramirez.islandtrip.web;
 
 import com.emramirez.islandtrip.dto.UpdateRequestDto;
+import com.emramirez.islandtrip.exception.ValidationException;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,8 @@ public class ReservationController {
                     .body(result);
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, RANGE_UNAVAILABLE_MESSAGE, ex);
+        } catch (ValidationException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
     }
 

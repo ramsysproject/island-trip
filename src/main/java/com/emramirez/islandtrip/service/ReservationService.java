@@ -1,6 +1,7 @@
 package com.emramirez.islandtrip.service;
 
 import com.emramirez.islandtrip.dto.UpdateRequestDto;
+import com.emramirez.islandtrip.exception.ValidationException;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
@@ -31,7 +32,7 @@ public class ReservationService {
      * @return the persisted reservation id
      */
     @Transactional
-    public Reservation book(Reservation reservation) {
+    public Reservation book(Reservation reservation) throws ValidationException {
         validator.validate(reservation);
         applyStrategy(reservation, ReservationStatus.ACTIVE);
 
