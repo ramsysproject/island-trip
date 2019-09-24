@@ -30,6 +30,12 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
+    /**
+     * Creates a new entity of type ${@link Reservation}.
+     *
+     * @param reservation
+     * @return the new reservation, or an error code
+     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
         try {
@@ -43,6 +49,14 @@ public class ReservationController {
         }
     }
 
+    /**
+     * Attemps to modify a given ${@link Reservation} entity.
+     *
+     * @param request holds the eTag
+     * @param id the resource id
+     * @param updateRequestDto the dto which holds the fields to modify
+     * @return the updated reservation, or an error code
+     */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Reservation> updateReservation(WebRequest request, @PathVariable UUID id,
                                                          @RequestBody UpdateRequestDto updateRequestDto) {

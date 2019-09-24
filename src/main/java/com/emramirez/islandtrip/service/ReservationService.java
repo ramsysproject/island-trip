@@ -38,6 +38,13 @@ public class ReservationService {
         return repository.save(reservation);
     }
 
+    /**
+     * This methods updates a ${@link Reservation} entity. It applies a strategy based on the reservation status.
+     *
+     * @param updateRequestDto the dto which holds modified data
+     * @param id the entity id
+     * @return the updated reservation
+     */
     @Transactional
     public Reservation update(UpdateRequestDto updateRequestDto, UUID id) {
         Reservation currentReservation = findById(id);
@@ -61,6 +68,12 @@ public class ReservationService {
         reservationStrategy.getHandler(status).ifPresent(it -> it.accept(currentReservation));
     }
 
+    /**
+     * Finds a ${@link Reservation} based on a given id.
+     *
+     * @param uuid the given id
+     * @return the reservation or null otherwise
+     */
     public Reservation findById(UUID uuid) {
         return  repository.findById(uuid);
     }
