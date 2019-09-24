@@ -26,13 +26,11 @@ Run from project root `java -jar target/islandtrip-1.0.0-SNAPSHOT.jar`
 
 c. Docker
 
-1. Pull the image `docker pull emaramirez1306/classic-bowling-scorer:initial`
-
-2. Run the image `docker run emaramirez1306/classic-bowling-scorer:initial`
-
-3. You can also build locally and run it, for building locally execute the `build.sh` script
+1. You can also build locally and run it, for building locally execute the `build.sh` script. After this you can run the image by executing `docker run -p 9000:9000 island-trip`
 
 * **How to run tests**
 
 1. Run `mvn clean test` to execute unit tests
 2. Run `mvn clean verify` to execute unit and integration tests
+
+Additional comments: in the project root you will find a postman collection for triggering requests.
