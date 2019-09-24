@@ -20,6 +20,7 @@ public class Reservation {
     private UUID id;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @Column

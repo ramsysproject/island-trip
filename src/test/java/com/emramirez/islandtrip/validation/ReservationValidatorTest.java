@@ -111,6 +111,22 @@ public class ReservationValidatorTest {
     }
 
     @Test
+    public void validate_reservationMoreThan30DaysAheadGiven_exceptionExpected() {
+        // arrange
+        LocalDate startingDate = LocalDate.now().plusDays(31);
+        LocalDate endingDate = startingDate.plusDays(3);
+        Reservation reservation = buildReservation(startingDate, endingDate);
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("The reservation can be placed up to 30 days in advance");
+        fixedClock = Clock.fixed(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant(), ZoneId.of("UTC"));
+        doReturn(fixedClock.instant()).when(clock).instant();
+        doReturn(fixedClock.getZone()).when(clock).getZone();
+
+        // act
+        reservationValidator.validate(reservation);
+    }
+
+    @Test
     public void validate_reservationWithValidRangeGiven_noExceptionExpected() {
         // arrange
         LocalDate startingDate = LocalDate.now().plusDays(1);

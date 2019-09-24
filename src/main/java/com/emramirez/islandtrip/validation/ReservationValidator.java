@@ -32,8 +32,11 @@ public class ReservationValidator implements Validator<Reservation> {
 
         LocalDate now = LocalDate.now(clock);
         if (DateUtils.getDaysBetween(now, arrivalDate) < 1) {
-            throw new IllegalArgumentException("The reservation must be at least 1 day ahead");
+            throw new IllegalArgumentException("The reservation must be at least 1 day ahead of arrival");
         }
-        // TODO validate reserve is up to 1 month in advance
+
+        if (DateUtils.getDaysBetween(now, arrivalDate) > 30) {
+            throw new IllegalArgumentException("The reservation can be placed up to 30 days in advance");
+        }
     }
 }
