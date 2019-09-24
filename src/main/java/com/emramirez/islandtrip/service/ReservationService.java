@@ -33,7 +33,7 @@ public class ReservationService {
     @Transactional
     public Reservation book(Reservation reservation) {
         validator.validate(reservation);
-        reservationStrategy.getHandler(ReservationStatus.ACTIVE).ifPresent(handler -> handler.accept(reservation));
+        applyStrategy(reservation, ReservationStatus.ACTIVE);
 
         return repository.save(reservation);
     }
@@ -41,19 +41,24 @@ public class ReservationService {
     @Transactional
     public Reservation update(UpdateRequestDto updateRequestDto, UUID id) {
         Reservation currentReservation = findById(id);
+        ReservationStatus updatedStatus = updateRequestDto.getStatus();
 
         if (( !updateRequestDto.getArrivalDate().equals(currentReservation.getArrivalDate())
                 || !updateRequestDto.getDepartureDate().equals(currentReservation.getDepartureDate()) ) &&
-                updateRequestDto.getStatus() == ReservationStatus.ACTIVE) {
-
+                updatedStatus == ReservationStatus.ACTIVE) {
             log.info("Request to modify reservation dates received");
             updateFields(currentReservation, updateRequestDto);
-            reservationStrategy.getHandler(updateRequestDto.getStatus()).ifPresent(it -> it.accept(currentReservation));
-        } else {
-            updateFields(currentReservation, updateRequestDto);
+            applyStrategy(currentReservation, updatedStatus);
+        } else if (updateRequestDto.getStatus() == ReservationStatus.CANCELLED){
+            applyStrategy(currentReservation, updatedStatus);
         }
+        updateFields(currentReservation, updateRequestDto);
 
         return repository.save(currentReservation);
+    }
+
+    private void applyStrategy(Reservation currentReservation, ReservationStatus status) {
+        reservationStrategy.getHandler(status).ifPresent(it -> it.accept(currentReservation));
     }
 
     public Reservation findById(UUID uuid) {

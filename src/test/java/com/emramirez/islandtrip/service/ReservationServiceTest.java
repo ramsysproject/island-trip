@@ -4,6 +4,7 @@ import com.emramirez.islandtrip.dto.UpdateRequestDto;
 import com.emramirez.islandtrip.model.Reservation;
 import com.emramirez.islandtrip.model.ReservationStatus;
 import com.emramirez.islandtrip.repository.ReservationRepository;
+import com.emramirez.islandtrip.service.status.CancelledReservationHandler;
 import com.emramirez.islandtrip.service.status.ReservationStrategy;
 import com.emramirez.islandtrip.utils.TestUtils;
 import com.emramirez.islandtrip.validation.ReservationValidator;
@@ -15,12 +16,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -36,6 +39,9 @@ public class ReservationServiceTest {
 
     @Mock
     ReservationStrategy reservationStrategy;
+
+    @Mock
+    CancelledReservationHandler cancelledReservationHandler;
 
     @InjectMocks
     ReservationService reservationService;
@@ -58,19 +64,106 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void update_validInputGiven_reservationIdExpected() {
+    public void update_unmodifiedReservationDatesGiven_saveAndNoStrategyInvokedExpected() {
         // arrange
-        UpdateRequestDto updateRequestDto = buildUpdateRequest();
+        UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
         Reservation savedReservation = buildResult();
         when(repository.findById(any(UUID.class))).thenReturn(buildReservation());
         when(repository.save(any())).thenReturn(savedReservation);
 
         // act
-        Reservation reservationResult = reservationService.update(updateRequestDto, RESERVATION_ID);
+        reservationService.update(updateRequestDto, RESERVATION_ID);
 
         // assert
-        assertThat(reservationResult.getId(), equalTo(RESERVATION_ID));
         verify(repository).save(any());
+        verifyZeroInteractions(reservationStrategy);
+    }
+
+    @Test
+    public void update_modifiedArrivalAndDepartureDateGiven_saveAndStrategyInvokedExpected() {
+        // arrange
+        UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
+        updateRequestDto.setArrivalDate(LocalDate.now().plusDays(2));
+        updateRequestDto.setDepartureDate(LocalDate.now().plusDays(3));
+        Reservation savedReservation = buildResult();
+        when(repository.findById(any(UUID.class))).thenReturn(buildReservation());
+        when(repository.save(any())).thenReturn(savedReservation);
+
+        // act
+        reservationService.update(updateRequestDto, RESERVATION_ID);
+
+        // assert
+        verify(repository).save(any());
+        verify(reservationStrategy).getHandler(updateRequestDto.getStatus());
+    }
+
+    @Test
+    public void update_modifiedArrivalDateGiven_saveAndStrategyInvokedExpected() {
+        // arrange
+        UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
+        updateRequestDto.setArrivalDate(LocalDate.now().plusDays(2));
+        Reservation savedReservation = buildResult();
+        when(repository.findById(any(UUID.class))).thenReturn(buildReservation());
+        when(repository.save(any())).thenReturn(savedReservation);
+
+        // act
+        reservationService.update(updateRequestDto, RESERVATION_ID);
+
+        // assert
+        verify(repository).save(any());
+        verify(reservationStrategy).getHandler(updateRequestDto.getStatus());
+    }
+
+    @Test
+    public void update_modifiedDepartureDateGiven_saveAndStrategyInvokedExpected() {
+        // arrange
+        UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.ACTIVE);
+        updateRequestDto.setDepartureDate(LocalDate.now().plusDays(2));
+        Reservation savedReservation = buildResult();
+        when(repository.findById(any(UUID.class))).thenReturn(buildReservation());
+        when(repository.save(any())).thenReturn(savedReservation);
+
+        // act
+        reservationService.update(updateRequestDto, RESERVATION_ID);
+
+        // assert
+        verify(repository).save(any());
+        verify(reservationStrategy).getHandler(updateRequestDto.getStatus());
+    }
+
+    @Test
+    public void update_cancelledStatusGiven_saveAndStrategyInvokedExpected() {
+        // arrange
+        UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.CANCELLED);
+        Reservation savedReservation = buildResult();
+        when(repository.findById(any(UUID.class))).thenReturn(buildReservation());
+        when(repository.save(any())).thenReturn(savedReservation);
+
+        // act
+        reservationService.update(updateRequestDto, RESERVATION_ID);
+
+        // assert
+        verify(repository).save(any());
+        verify(reservationStrategy).getHandler(updateRequestDto.getStatus());
+    }
+
+    @Test
+    public void update_validStatusGiven_strategyFoundAndInvokedExpected() {
+        // arrange
+        UpdateRequestDto updateRequestDto = buildUpdateRequest(ReservationStatus.CANCELLED);
+        Reservation savedReservation = buildResult();
+        when(repository.findById(any(UUID.class))).thenReturn(buildReservation());
+        when(repository.save(any())).thenReturn(savedReservation);
+        when(reservationStrategy.getHandler(updateRequestDto.getStatus()))
+                .thenReturn(Optional.of(cancelledReservationHandler));
+
+        // act
+        reservationService.update(updateRequestDto, RESERVATION_ID);
+
+        // assert
+        verify(repository).save(any());
+        verify(reservationStrategy).getHandler(updateRequestDto.getStatus());
+        verify(cancelledReservationHandler).accept(any());
     }
 
     private Reservation buildReservation() {
@@ -80,10 +173,11 @@ public class ReservationServiceTest {
         return reservation;
     }
 
-    private UpdateRequestDto buildUpdateRequest() {
+    private UpdateRequestDto buildUpdateRequest(ReservationStatus status) {
         UpdateRequestDto updateRequest = new UpdateRequestDto();
         updateRequest.setArrivalDate(LocalDate.now());
         updateRequest.setDepartureDate(LocalDate.now().plusDays(1));
+        updateRequest.setStatus(status);
         return updateRequest;
     }
 
