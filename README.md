@@ -33,4 +33,10 @@ c. Docker
 1. Run `mvn clean test` to execute unit tests
 2. Run `mvn clean verify` to execute unit and integration tests
 
-Additional comments: in the project root you will find a postman collection for triggering requests.
+* **POSTMAN collection**
+
+In the project root you will find a postman collection for triggering requests.
+
+* **SWAGGER UI**
+
+http://localhost:9000/swagger-ui.html
