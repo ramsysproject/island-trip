@@ -17,7 +17,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<lombok.version>1.18.10</lombok.version>
-        <h2.version>1.4.199</h2.version>
+        <h2.version>2.1.210</h2.version>
         <jackson.datatype.version>2.9.7</jackson.datatype.version>
         <jacoco.plugin.version>0.8.4</jacoco.plugin.version>
         <mvn.failsafe.version>2.17</mvn.failsafe.version>
